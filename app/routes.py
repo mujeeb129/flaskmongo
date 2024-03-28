@@ -9,7 +9,7 @@ from app.authentication import authenticate, create_token
 
 @products.route("/", methods=["GET"])
 @authenticate
-def products_list():
+def products_list(user):
     products = db.products
     products_list = list(
         products.find(
@@ -71,7 +71,7 @@ def delete_product(product_id):
         return jsonify({"message": f"Caught an exception: {str(e)}"}), 500
     
 
-@users.route("/login", methods=["GET"])
+@users.route("/login", methods=["POST"])
 def login():
     data = request.json
     try:
@@ -109,9 +109,10 @@ def register():
         user_collection.insert_one(user_details)
         success, tokens = create_token(user_details)
         if success:
-            return jsonify({"message": "User created", "data": {"user"}}), 201
+            return jsonify({"message": "User created", "data": {"user": user_collection.find_one({"username": data["username"]})}}), 201
         abort(500, description=f"Something went wrong: {tokens}")
-
+    except KeyError as keyerror:
+        abort(400, description=f"Something went wrong: {keyerror}")
     except Exception as e:
-        return abort(500, description=str(e))
+        return abort(500, description=f"Caught an exception: {str(e)}")
     

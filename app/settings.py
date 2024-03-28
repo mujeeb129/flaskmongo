@@ -8,4 +8,4 @@ class BaseConfig(object):
     REFRESH_TOKEN_AGE = 10
 
 class DevelopmentConfig(BaseConfig):
-    DEBUG = True
+    DEBUG = True 
